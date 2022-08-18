@@ -82,6 +82,13 @@ Class Line
     public function get_property($prop) {
         return $this->{$prop};
     }
+
+    /**
+     * Check if Line is query line object (D-Line)
+     */
+    public function is_query_line() {
+        return (isset($this->line_type) && $this->line_type == "D");
+    }
 }
 
 ?>
