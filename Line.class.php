@@ -75,6 +75,13 @@ Class Line
         $this->line_index = $index;
         $this->line_string = $string;
     }
+
+    /**
+     * Get Line object property by name
+     */
+    public function get_property($prop) {
+        return $this->{$prop};
+    }
 }
 
 ?>
