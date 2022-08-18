@@ -89,6 +89,35 @@ Class Line
     public function is_query_line() {
         return (isset($this->line_type) && $this->line_type == "D");
     }
+
+    /**
+     * Check if Line is valid (structure and possible values)
+     * with regex
+     */
+    private function is_valid_line() {
+        $char = substr($this->line_string, 0, 1);
+        if ($char == "C"){
+            $this->line_type = "C";
+
+            $pattern = "/^(C)\s(\d{1,2}(\.\d)?)\s(\d{1,2}(\.\d{1,2}(\.\d)?)?)\s([PN])\s(([012]\d)\.([01]\d)\.([12]\d{3}))\s(\d+)$/";
+            if (preg_match($pattern, $this->line_string) === 1) {
+                return true;
+            } else {
+                throw new Exception("Line (C-line) is not valid line.");
+            }
+        } else if ($char == "D") {
+            $this->line_type = "D";
+
+            $pattern = "/^(D)\s((\d{1,2}(\.\d)?)|(\*))\s((\d{1,2}(\.\d{1,2}(\.\d)?)?)|(\*))\s([PN])\s(([01]\d)\.([01]\d)\.([12]\d{3})(\-([012]\d)\.([01]\d)\.([12]\d{3}))?)$/";
+            if (preg_match($pattern, $this->line_string) === 1) {
+                return true;
+            } else {
+                throw new Exception("Line (D-line) is not valid line.");
+            }
+        } else {
+            throw new Exception("Line has to start with character C or D.");
+        }
+    }
 }
 
 ?>
