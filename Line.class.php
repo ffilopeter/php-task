@@ -73,7 +73,7 @@ Class Line
 
     public function __construct($index, $string) {
         $this->line_index = $index;
-        $this->line_string = $string;
+        $this->line_string = trim($string);
         $this->process_line();
     }
 
@@ -95,13 +95,10 @@ Class Line
      * Check if line is valid and destructure
      */
     private function process_line() {
-        if ($this->is_valid_line())
-        {
-            if ($this->line_type == "C")
-            {
+        if ($this->is_valid_line()) {
+            if ($this->line_type == "C") {
                 $this->destructure_c();
-            } else if ($this->line_type == "D")
-            {
+            } else if ($this->line_type == "D") {
                 $this->destructure_d();
             }
         }
@@ -180,6 +177,73 @@ Class Line
 
         // Response date
         $this->date = explode("-", $groups[4]);
+    }
+
+    public function match_query_line($lines) {
+        $matching = array();
+        foreach ($lines as $line) {
+            
+            // Match only C-lines
+            if ($line->get_property("line_type") == "D") { continue; }
+
+            if ($this->service_id != "*") {
+                if (isset($this->service_id) && $this->service_id != $line->get_property("service_id")) {
+			        continue; 
+		        }
+
+                if ($this->variation_id != "*") {
+                    if (isset($this->variation_id) && $this->variation_id != $line->get_property("variation_id")) {
+			            continue;
+		            }
+                }
+            }
+
+            if ($this->question_type_id != "*") {
+                if (isset($this->question_type_id) && $this->question_type_id != $line->get_property("question_type_id")) {
+                    continue;
+                }
+
+                if ($this->category_id != "*") {
+                    if (isset($this->category_id) && $this->category_id != $line->get_property("category_id")) {
+                        continue;
+                    }
+
+                    if ($this->subcategory_id != "*") {
+                        if (isset($this->subcategory_id) && $this->subcategory_id != $line->get_property("subcategory_id")) {
+                        continue;
+                        }
+                    }
+                }
+            }
+
+            if ($this->response_type != $line->get_property("response_type")) {
+		        continue;
+	        }
+
+            if (!$this->date_in_range($this->date, $line->get_property("date")[0])) { 
+                continue;
+            }
+
+            $matching[] = $line;
+        }
+
+        return $matching;
+    }
+
+    private function date_in_range($range, $date) {
+        $n_dates = count($range);
+
+        if ($n_dates == 1) {
+            return ($date == $range[0]);
+        } else if ($n_dates == 2) {
+            $t1 = strtotime($range[0]);
+            $t2 = strtotime($range[1]);
+	        $t3 = strtotime($date);
+
+            return (($t3 >= $t1) && ($t3 <= $t2));
+        }
+
+        return false;
     }
 
 }
