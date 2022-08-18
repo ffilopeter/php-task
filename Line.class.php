@@ -74,6 +74,7 @@ Class Line
     public function __construct($index, $string) {
         $this->line_index = $index;
         $this->line_string = $string;
+        $this->process_line();
     }
 
     /**
@@ -88,6 +89,22 @@ Class Line
      */
     public function is_query_line() {
         return (isset($this->line_type) && $this->line_type == "D");
+    }
+
+        /**
+     * Check if line is valid and destructure
+     */
+    private function process_line() {
+        if ($this->is_valid_line())
+        {
+            if ($this->line_type == "C")
+            {
+                $this->destructure_c();
+            } else if ($this->line_type == "D")
+            {
+                $this->destructure_d();
+            }
+        }
     }
 
     /**
@@ -118,6 +135,53 @@ Class Line
             throw new Exception("Line has to start with character C or D.");
         }
     }
+
+    private function destructure_c() {
+        // Split into "groups" (exploded by whitespace)
+        $groups = explode(" ", $this->line_string);
+
+        // Service ID & Variation ID
+        $arr = explode(".", $groups[1]);
+        if (isset($arr[0])) { $this->service_id = $arr[0]; }
+        if (isset($arr[1])) { $this->variation_id = $arr[1]; }
+
+        // Question type ID, Category & Subcategory ID
+        $arr = explode(".", $groups[2]);
+        if (isset($arr[0])) { $this->question_type_id = $arr[0]; }
+        if (isset($arr[1])) { $this->category_id = $arr[1]; }
+        if (isset($arr[2])) { $this->subcategory_id = $arr[2]; }
+
+        // Response type
+        $this->response_type = $groups[3];
+
+        // Response date
+        $this->date[] = $groups[4];
+
+        // Waiting time
+        $this->time = $groups[5];
+    }
+
+    private function destructure_d() {
+        $groups = explode(" ", $this->line_string);
+
+        // Service ID & Variation ID
+        $arr = explode(".", $groups[1]);
+        if (isset($arr[0])) { $this->service_id = $arr[0]; }
+        if (isset($arr[1])) { $this->variation_id = $arr[1]; }
+
+        // Question type ID, Category & Subcategory ID
+        $arr = explode(".", $groups[2]);
+        if (isset($arr[0])) { $this->question_type_id = $arr[0]; }
+        if (isset($arr[1])) { $this->category_id = $arr[1]; }
+        if (isset($arr[2])) { $this->subcategory_id = $arr[2]; }
+
+        // Response type
+        $this->response_type = $groups[3];
+
+        // Response date
+        $this->date = explode("-", $groups[4]);
+    }
+
 }
 
 ?>
