@@ -65,16 +65,16 @@ if ($handle) {
                 // and store it in global $results array
                 if ($count_matching >= 1) {
                     if ($count_matching == 1) {
-                        $results[] = $matching[0]->get_property("time");
+                        $results[] = intval($matching[0]->get_property("time"));
                     } else {
                         // Calculate average waiting time
                         $average = 0;
                         for ($i = 0; $i < $count_matching; $i++) {
-                            $average += $matching[$i]->get_property("time");
+                            $average += intval($matching[$i]->get_property("time"));
                         }
             
                         if ($average > 0) {
-                            $results[] = ($average / $count_matching);
+                            $results[] = round($average / $count_matching);
                         } else {
                             $results[] = "0";
                         }
