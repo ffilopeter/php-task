@@ -39,6 +39,11 @@ if ($handle) {
             continue;
         }
 
+        // Line limit - process max 100.000 lines
+        if ($read_lines == 100000) {
+            break;
+        }
+
         try {
             // Create new Line object
             $line = new Line($read_lines, $read);
